@@ -6,7 +6,8 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use AppBundle\Repository\UsersRepository;
-use AppBundle\Entity\Usuario;
+use Symfony\Component\Validator\Constraints as Assert;
+
 
 
 
@@ -24,7 +25,7 @@ class RegistroController extends Controller{
         $existe=$repo->comprobarEmail($email);
 
         if($existe){
-            return new JsonResponse(array('error'=>'El email introducido ya ha sido registrado previamente.'));
+            return new JsonResponse(array('error'=>'El email introducido ya ha sido registrado previamente. Introduzca uno nuevo para registrarse.'));
         }
         else{
             $nombre= $_POST['nombre'];
@@ -36,18 +37,23 @@ class RegistroController extends Controller{
             $num_operaciones=0;
             $active=true;
 
-            $usuario= new Usuario;
-            $usuario->setID($id);
-            $usuario->setNombre($nombre);
-            $usuario->setEmail($email);
-            $usuario->setContraseña($passwd);
-            $usuario->setFechaNacim(new \DateTime($date));
-            $usuario->setNum_Operaciones($num_operaciones);
-            $usuario->setActive($active);
-            $usuario->setRol($rol);
+            $array=[$email, $nombre, $passwd, $date, $rol, $id, $num_operaciones, $active];
 
-            $repo->crearUsers($usuario);
-            return new JsonResponse(array('status'=>'Success'));
+            $validarservice=$this->container->get('validaruser');
+
+            $error=$validarservice->validarusuario($array);
+
+            if($error){
+                return new JsonResponse(array('error'=>$error));
+            }
+
+            $registrarservice=$this->container->get('registrarusuario'); //Registramos el servicio
+
+            $resultado=$registrarservice->registraruser($array); //llamamos a la funcion registraruser del servicio y le pasamos el array con los datos
+
+            if($resultado==true){
+                return new JsonResponse(array('status'=>'Success'));
+            }
         }
     }
 }

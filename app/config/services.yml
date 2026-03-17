@@ -7,3 +7,11 @@ services:
     #service_name:
     #    class: AppBundle\Directory\ClassName
     #    arguments: ['@another_service_name', 'plain_value', '%parameter_name%']
+
+    registrarusuario:
+        class: AppBundle\Service\RegistroService
+        arguments: ["@doctrine.orm.entity_manager"]
+
+    validaruser:
+        class: AppBundle\Service\ValidarUserService
+        arguments: ["@validator"]

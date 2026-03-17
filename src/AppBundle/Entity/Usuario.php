@@ -34,8 +34,11 @@ class Usuario{
     /** @ORM\Column(type="integer", name="is_active") */
     private $Active;
 
-    /** @ORM\Column(type="string", name="rol") */
-    private $Rol;
+    /** 
+     * @ORM\ManyToOne(targetEntity="Rol", inversedBy="usuarios")
+     * @ORM\JoinColumn(name="rol_id", referencedColumnName="id", nullable=true)
+     */
+    private $rol_relacion;
 
     public function getID(){ return $this->id;}
     public function getnombre(){ return $this->nombre;}
@@ -44,7 +47,7 @@ class Usuario{
     public function getFecha_Nacim(){ return $this->Fecha_Nacim;}
     public function getNum_Operaciones(){ return $this->Num_Operaciones;}
     public function getActive(){ return $this->Active;}
-    public function getRol(){ return $this->Rol;}
+    public function getRolrelacion(){ return $this->rol_relacion;}
 
 
     public function setID($i){ $this->id = $i; return $this; }
@@ -54,10 +57,11 @@ class Usuario{
     public function setFechaNacim($f){ $this->Fecha_Nacim = $f; return $this; }
     public function setNum_Operaciones($no){ $this->Num_Operaciones = $no; return $this; }
     public function setActive($a){ $this->Active = $a; return $this; }
-    public function setRol($r){ $this->Rol = $r; return $this; }
+    public function setRolrelacion($r){ $this->rol_relacion = $r; return $this; }
 
 
 }
 
 
 ?>
+

@@ -21,8 +21,8 @@
     <main>
         <form id="Ini_sesion">
             <h4>Introduce tu email y tu contraseña<h4>
-            <input type="text" placeholder="email" required>
-            <input type="password" placeholder="contraseña" required>
+            <input type="text" placeholder="email" id="email" required>
+            <input type="password" placeholder="contraseña" id="contraseña" required>
             <hr>
             <button type="submit">Iniciar Sesión</button>
         </form>
@@ -37,7 +37,10 @@
     <script>
         $(document).ready(function(){
             $("#Ini_sesion").on("submit", function(){
-                
+                var email=$("#email").val();
+                var pswd=$("#contraseña").val();
+
+                //Llamada a controlador pasandole la info. Este controlador decide que pagina cargar en funcion de si el usuario es admin (podra ver todos los clientes y eliminar o actualizar la informacion de cualquiera) o client (podra actualizar su informacion o eliminar su usuario)
             });
 
         });

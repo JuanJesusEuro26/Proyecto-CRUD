@@ -10,8 +10,8 @@ class UsersRepository extends EntityRepository{
     public function crearUsers(Usuario $usuario){
         $conn= $this->getEntityManager()->getConnection();
 
-        $sql = "INSERT INTO registrar_users (id, is_active, password, email, fecha_nacimiento, nombre, num_operaciones, rol) 
-                VALUES (:id, :active, :pass, :email, :fecha, :nombre, :ops, :rol)";
+        $sql = "INSERT INTO registrar_users (id, is_active, password, email, fecha_nacimiento, nombre, num_operaciones, rol_id) 
+                VALUES (:id, :active, :pass, :email, :fecha, :nombre, :ops, :rol_id)";
 
         $stmnt=$conn->prepare($sql);
         $stmnt->bindValue('id', $usuario->getID());
@@ -21,7 +21,7 @@ class UsersRepository extends EntityRepository{
         $stmnt->bindValue('fecha', $usuario->getFecha_Nacim()->format('Y-m-d'));
         $stmnt->bindValue('nombre', $usuario->getnombre());
         $stmnt->bindValue('ops', $usuario->getNum_Operaciones());
-        $stmnt->bindValue('rol', $usuario->getRol());
+        $stmnt->bindValue('rol_id', $usuario->getRolrelacion()->getId());
 
         $stmnt->execute();
 
