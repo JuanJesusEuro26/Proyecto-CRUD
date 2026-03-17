@@ -5,11 +5,13 @@ namespace AppBundle\Entity;
 //Esta entidad mapeara los atributos de la clase usuarios de los usuarios de la tabla RegistrarUsers
 use Doctrine\ORM\Mapping as ORM;
 
+use Symfony\Component\Security\Core\User\UserInterface; //Implementaremos esto para poder tener mas seguridad en la gestion de las contraseñas
+
 /**
  * @ORM\Table(name="registrar_users")
  * @ORM\Entity(repositoryClass="AppBundle\Repository\UsersRepository")
  */
-class Usuario{
+class Usuario implements UserInterface{
    /**
      * @ORM\Id
      * @ORM\Column(type="integer", name="id")
@@ -34,8 +36,11 @@ class Usuario{
     /** @ORM\Column(type="integer", name="is_active") */
     private $Active;
 
-    /** @ORM\Column(type="string", name="rol") */
-    private $Rol;
+    /** 
+     * @ORM\ManyToOne(targetEntity="Rol", inversedBy="usuarios")
+     * @ORM\JoinColumn(name="rol_id", referencedColumnName="id", nullable=true)
+     */
+    private $rol_relacion;
 
     public function getID(){ return $this->id;}
     public function getnombre(){ return $this->nombre;}
@@ -44,7 +49,7 @@ class Usuario{
     public function getFecha_Nacim(){ return $this->Fecha_Nacim;}
     public function getNum_Operaciones(){ return $this->Num_Operaciones;}
     public function getActive(){ return $this->Active;}
-    public function getRol(){ return $this->Rol;}
+    public function getRolrelacion(){ return $this->rol_relacion;}
 
 
     public function setID($i){ $this->id = $i; return $this; }
@@ -54,10 +59,31 @@ class Usuario{
     public function setFechaNacim($f){ $this->Fecha_Nacim = $f; return $this; }
     public function setNum_Operaciones($no){ $this->Num_Operaciones = $no; return $this; }
     public function setActive($a){ $this->Active = $a; return $this; }
-    public function setRol($r){ $this->Rol = $r; return $this; }
+    public function setRolrelacion($r){ $this->rol_relacion = $r; return $this; }
 
+    public function getRoles() {
+        // Retornamos el nombre del rol vinculado
+        return array($this->getRolrelacion()->getNombre());
+    }
+
+    public function getPassword() {
+        return $this->contraseña;
+    }
+
+    public function getSalt() {
+        return null; // No es necesario con algoritmos modernos como bcrypt
+    }
+
+    public function getUsername() {
+        return $this->email;
+    }
+
+    public function eraseCredentials() {
+        // Se usa para limpiar datos sensibles temporales
+    }
 
 }
 
 
 ?>
+

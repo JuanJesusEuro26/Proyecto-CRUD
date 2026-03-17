@@ -60,10 +60,9 @@
                     nombre: $("#nombre").val(),
                     date:   $("#fechanacim").val(),
                     passwd: $("#contraseña").val(),
-                    rol:    $("#root").is(':checked') ? 'root' : 'user'
+                    rol:    $("#root").is(':checked') ? 'ROLE_ADMIN' : 'ROLE_CLIENT'
                 };
 
-                btn.prop("disabled", true).text("Registrando...");
 
                 $.ajax({
                     url: "{{ path('registraruser') }}",
@@ -76,15 +75,13 @@
                             $("#Res").html("Usuario registrado correctamente en la base de datos.");
                             $("#Res").show();
                         } else {
-                            $("#Res").html("Hubo un problema al registrar al usuario en la base de datos. Intentelo de nuevo.");
+                            $("#Res").html(res.error);
                             $("#Res").show();
                         }
-                        btn.prop("disabled", false).text("Registrar Usuario");
                     },
                     error: function(xhr){
                         alert("Error crítico en el servidor. Revisa los logs.");
-                        console.log(xhr.responseText); // Esto te dirá el error real en la consola
-                        btn.prop("disabled", false).text("Registrar Usuario");
+                        console.log(xhr.responseText); // Esto dirá el error real en la consola
                     }
                 });
             });
