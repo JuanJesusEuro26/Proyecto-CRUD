@@ -18,9 +18,9 @@ class Rol{
     private $id;
 
     /**
-     * @ORM\Column(type="string", length=10, unique=true)
+     * @ORM\Column(type="string", length=15, unique=true)
      */
-    private $nombrerol; //roles: admin o client 
+    private $nombrerol; //roles: ROLE_ADMIN O ROLE_CLIENT
 
     /**
      * @ORM\OneToMany(targetEntity="Usuario", mappedBy="rol_relacion")

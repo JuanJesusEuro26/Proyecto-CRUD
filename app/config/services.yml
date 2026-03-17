@@ -10,8 +10,8 @@ services:
 
     registrarusuario:
         class: AppBundle\Service\RegistroService
-        arguments: ["@doctrine.orm.entity_manager"]
-
+        arguments: ["@doctrine.orm.entity_manager", "@security.password_encoder"]
+    
     validaruser:
         class: AppBundle\Service\ValidarUserService
         arguments: ["@validator"]

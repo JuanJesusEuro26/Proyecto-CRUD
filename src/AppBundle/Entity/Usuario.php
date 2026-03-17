@@ -5,11 +5,13 @@ namespace AppBundle\Entity;
 //Esta entidad mapeara los atributos de la clase usuarios de los usuarios de la tabla RegistrarUsers
 use Doctrine\ORM\Mapping as ORM;
 
+use Symfony\Component\Security\Core\User\UserInterface; //Implementaremos esto para poder tener mas seguridad en la gestion de las contraseñas
+
 /**
  * @ORM\Table(name="registrar_users")
  * @ORM\Entity(repositoryClass="AppBundle\Repository\UsersRepository")
  */
-class Usuario{
+class Usuario implements UserInterface{
    /**
      * @ORM\Id
      * @ORM\Column(type="integer", name="id")
@@ -59,6 +61,26 @@ class Usuario{
     public function setActive($a){ $this->Active = $a; return $this; }
     public function setRolrelacion($r){ $this->rol_relacion = $r; return $this; }
 
+    public function getRoles() {
+        // Retornamos el nombre del rol vinculado
+        return array($this->getRolrelacion()->getNombre());
+    }
+
+    public function getPassword() {
+        return $this->contraseña;
+    }
+
+    public function getSalt() {
+        return null; // No es necesario con algoritmos modernos como bcrypt
+    }
+
+    public function getUsername() {
+        return $this->email;
+    }
+
+    public function eraseCredentials() {
+        // Se usa para limpiar datos sensibles temporales
+    }
 
 }
 
