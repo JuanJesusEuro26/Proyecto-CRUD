@@ -1,0 +1,96 @@
+{% extends 'proyectfiles/index.html.twig' %}
+
+    {% block head %}
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            {{ parent() }}
+            <title>Registrar Usuario</title>
+        </head>
+    {% endblock %}
+    
+    
+{% block body %}
+<body> 
+    <header>
+        <h1>Registro de usuarios</h1>
+        <h3>En esta página podrás registrar un usuario nuevo<h3>
+    </header>
+
+    <main>
+        <form id="Registro">
+            <h4>Introduce los datos del usuario para registrarlo</h4>
+            <label for="email">Email: </label>
+            <input type="email" placeholder="email@gmail.com" id="email" required>
+            <br>
+            <label for="nombre">Nombre: </label>
+            <input type="text" placeholder="nombre" id="nombre" required>
+            <br>
+            <label for="fechanacim">Fecha de nacimiento: </label>
+            <input type="date" placeholder="01/01/0001" id="fechanacim" required>
+            <br>
+            <label for="contraseña">Contraseña: </label>
+            <input type="password" placeholder="contraseña" id="contraseña" required>
+            <br>
+            <label for="root">¿Usuario root?: </label>
+            <input type="checkbox" id="root">
+            <br>
+            <button type="submit">Registrar Usuario</button>
+        </form>
+
+        <h3 id="Res">Resultado</h3>
+        <button onclick="location.href='{{ path('index') }}'">Volver a inicio</button>
+    </main>
+    
+
+    <script>
+            $(document).ready(function(){
+                $("#Registro").show();
+                $("#Res").hide();
+
+            $("#Registro").on("submit", function(e){
+                e.preventDefault();
+
+                // DEFINIMOS btn aquí arriba para que sea visible en todo el AJAX
+                var btn = $(this).find("button[type='submit']");
+                
+                // RECOGEMOS datos como OBJETO (Clave: Valor)
+                var datos = {
+                    email:  $("#email").val(),
+                    nombre: $("#nombre").val(),
+                    date:   $("#fechanacim").val(),
+                    passwd: $("#contraseña").val(),
+                    rol:    $("#root").is(':checked') ? 'root' : 'user'
+                };
+
+                btn.prop("disabled", true).text("Registrando...");
+
+                $.ajax({
+                    url: "{{ path('registraruser') }}",
+                    type: 'POST',
+                    data: datos, // Ahora sí enviamos las etiquetas correctas
+                    success: function(res){
+                        if(res.status === 'Success'){
+                            $("#Registro")[0].reset();
+                            $("#Registro").hide();
+                            $("#Res").html("Usuario registrado correctamente en la base de datos.");
+                            $("#Res").show();
+                        } else {
+                            $("#Res").html("Hubo un problema al registrar al usuario en la base de datos. Intentelo de nuevo.");
+                            $("#Res").show();
+                        }
+                        btn.prop("disabled", false).text("Registrar Usuario");
+                    },
+                    error: function(xhr){
+                        alert("Error crítico en el servidor. Revisa los logs.");
+                        console.log(xhr.responseText); // Esto te dirá el error real en la consola
+                        btn.prop("disabled", false).text("Registrar Usuario");
+                    }
+                });
+            });
+        });
+
+    </script>
+</body>
+</html>
+{% endblock %}
