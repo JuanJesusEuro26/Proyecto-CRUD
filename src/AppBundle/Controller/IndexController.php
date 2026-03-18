@@ -7,6 +7,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use AppBundle\Repository\UsersRepository;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Session\Session;
 
 class IndexController extends Controller{
     /**
@@ -41,6 +42,11 @@ class IndexController extends Controller{
                 $contraseñacorrecta=$repo->comprobarContraseña($email, $password);
                 if($contraseñacorrecta){
                     $rolusuario=$repo->comprobarRol($email);
+
+                    // GUARDAR EMAIL EN SESIÓN 
+                    $session = new Session();
+                    $session->set('user_email', $email);
+
                     if($rolusuario==1){ //Si es admin
                         return new JsonResponse(array("redirect" => $this->generateUrl('admin_home')));
                     } else if($rolusuario==2){ //Si es cliente
@@ -72,7 +78,27 @@ class IndexController extends Controller{
      * @Route("/Index/Cliente", name="client_home")
      */
     public function clientHomeAction() {
-        return $this->render('proyectfiles/clientmenu.html.twig');
+        $session = new Session();
+        $email = $session->get('user_email');
+
+        // Si no hay email en sesión, lo echamos al login
+        if (!$email) {
+            return $this->redirectToRoute('index');
+        }
+
+
+        return $this->render('proyectfiles/clientmenu.html.twig', [
+            'emailUsuario' => $email
+        ]);
+    }
+
+    /**
+     * @Route("/Logout", name="logout")
+     */
+    public function logoutAction() {
+        $session = new Session();
+        $session->clear(); // Vacía la sesión
+        return $this->redirectToRoute('index');
     }
 }
 ?>

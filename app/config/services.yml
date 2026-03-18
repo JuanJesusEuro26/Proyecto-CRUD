@@ -15,3 +15,15 @@ services:
     validaruser:
         class: AppBundle\Service\ValidarUserService
         arguments: ["@validator"]
+
+    consultardatos:
+        class: AppBundle\Service\ConsultarService
+        arguments: ["@doctrine.orm.entity_manager"]
+
+    aumentarnops:
+        class: AppBundle\Service\SumarOpsService
+        arguments: ["@doctrine.orm.entity_manager"]
+
+    actualizardatos:
+        class: AppBundle\Service\ActualizarService
+        arguments: ["@doctrine.orm.entity_manager"]
