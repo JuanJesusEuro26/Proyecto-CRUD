@@ -1,0 +1,46 @@
+{% extends 'proyectfiles/index.html.twig' %}
+
+    {% block head %}
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            {{ parent() }}
+            <title>Menú de Clientes</title>
+        </head>
+    {% endblock %}
+
+{% block body %}
+<body>
+    <header>
+    <h1>Menú de Clientes</h1>
+    <h2>Bienvenido cliente, en esta página podrás:</h2>
+    <ul>
+        <li>Consultar tus datos.</li>
+        <li>Actualizar tus datos.</li>
+        <li>Eliminar tu usuario.</li>
+    </ul>
+    <hr>
+    </header>
+
+    <main>
+        <button id="Consulta">Consultar tus datos (los datos se refrescan al pulsar el boton si haces algun cambio)</button>
+
+        <div id="datos_user">
+            <p id="consultar_email">Email: </p>
+            <p id="consultar_nombre">Nombre: </p>
+            <p id="consultar_fechanacim">Fecha de Nacimiento: </p>
+            <p id="consultar_numops">Numero de Operaciones: </p>
+            <p id="consultar_email">Email: </p>
+
+
+
+            
+        </div>
+
+        <button id="Actualizar tus datos">Actualizar tus datos</button>
+
+        <button id="Eliminar usuario">Eliminar Usuario</button>
+    </main>
+</body>
+</html>
+{% endblock %}

@@ -26,6 +26,7 @@
             <hr>
             <button type="submit">Iniciar Sesión</button>
         </form>
+        <h3 style="color: red;" id="Res"></h3>
         <br>
         <div id="Registro">
             <h4>¿No tienes usuario creado o quieres crear otro usuario?</h4>
@@ -36,11 +37,36 @@
 
     <script>
         $(document).ready(function(){
-            $("#Ini_sesion").on("submit", function(){
+            $("#Res").hide();
+            $("#Ini_sesion").on("submit", function(e){
+                $("#Res").hide();
+                e.preventDefault();
+
                 var email=$("#email").val();
                 var pswd=$("#contraseña").val();
+                var datos={email: email, pswd: pswd};
 
                 //Llamada a controlador pasandole la info. Este controlador decide que pagina cargar en funcion de si el usuario es admin (podra ver todos los clientes y eliminar o actualizar la informacion de cualquiera) o client (podra actualizar su informacion o eliminar su usuario)
+                $.ajax({
+                    url:" {{ path('Identificacion') }}",
+                    type: 'POST',
+                    data: datos,
+                    success: function(res){
+                        if(res.redirect){
+                            window.location.href = res.redirect; // Redirigimos si todo es ok
+                        } else {
+                            $("#Res").html(res.error);
+                            $("#Ini_sesion")[0].reset();
+                            $("#Res").show();
+                        }
+                    },
+                    error: function(xhr){
+                        console.log(xhr.responseText);
+                        alert("Error crítico en el servidor.");
+                    }
+
+
+                });
             });
 
         });
