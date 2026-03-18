@@ -140,7 +140,7 @@
                             $("#actualizar_nombre").val("");
 
                             $("#Consulta").trigger('click');
-                            
+
                             $("#camposacambiar").fadeOut();                        
                         } else if(res.error){
                             $("#res").html(res.error);                            
@@ -156,7 +156,13 @@
             });
 
             $("#Eliminar").click(function(){
-
+                var confirmar = confirm("¿Estás seguro de que quieres eliminar tu cuenta? Esta acción no se puede deshacer.");
+    
+                if (confirmar) {
+                    alert("Usuario eliminado correctamente. Redirigiendo al inicio...");
+                    // Redirigimos a la ruta de eliminar pasando el email
+                    window.location.href = "{{ path('Eliminar') }}?email=" + emailUsuario;
+                }
             });
         });
     </script>

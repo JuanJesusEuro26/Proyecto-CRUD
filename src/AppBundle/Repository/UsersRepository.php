@@ -143,6 +143,15 @@ class UsersRepository extends EntityRepository{
         $stmnt->bindValue('correoantiguo', $datos[3]);
         return $stmnt->execute();
     }
+
+    public function EliminarUser(string $email) {
+        $sql = "DELETE FROM registrar_users WHERE email = :correo";
+        
+        $stmnt = $this->prepareconn()->prepare($sql);
+        $stmnt->bindValue('correo', $email);
+        
+        return $stmnt->execute();
+    }
 }
 
 ?>

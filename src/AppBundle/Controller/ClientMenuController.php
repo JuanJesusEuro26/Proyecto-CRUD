@@ -87,6 +87,28 @@ class ClientMenuController extends Controller{
 
         return new JsonResponse(array("exito"=>"Datos actualizados correctamente. Se ha llamado a la funcion de consultar datos para que compruebes el cambio."));
     }
+
+    /**
+     * @Route("Index/Cliente/Eliminar", name="Eliminar")
+     */
+    function eliminarAction() {
+        // 1. Pillamos el email de la URL (Query String)
+        $email = $_GET['email'] ?? null;
+
+        if ($email) {
+            /** @var UsersRepository $repo */
+            $repo=$this->getDoctrine()->getRepository('AppBundle:Usuario');
+            
+            // 2. Llamamos a la función del repositorio (que crearemos ahora)
+            $repo->EliminarUser($email);
+
+            // 3. Limpiamos la sesión para que el usuario deje de estar logueado
+            $this->get('session')->clear();
+        }
+
+        // 4. Redirigimos al Index
+        return $this->redirectToRoute('index');
+    }
 }
 
 
