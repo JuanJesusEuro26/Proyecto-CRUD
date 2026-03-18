@@ -106,6 +106,43 @@ class UsersRepository extends EntityRepository{
         $activo=$fila['is_active'];
         return $activo;
     }
+
+    public function infoUser(string $email){
+        $sql="SELECT * FROM registrar_users WHERE email= :correo";
+        $stmnt=$this->prepareconn()->prepare($sql);
+        $stmnt->bindValue('correo', $email);
+        $stmnt->execute();
+
+        $fila=$stmnt->fetch();
+        if(!$fila){
+            return false; 
+        }
+        
+        return $fila;
+    }
+
+    public function aumentarnOps(string $email){
+        $sql = "UPDATE registrar_users 
+        SET num_operaciones = num_operaciones + 1 
+        WHERE email = :correo";        
+        
+        $stmnt=$this->prepareconn()->prepare($sql);
+        $stmnt->bindValue('correo', $email);
+        return $stmnt->execute();
+    }
+
+    public function ActualizarUser(array $datos){
+        $sql = "UPDATE registrar_users 
+        SET email = :nuevoemail, nombre= :nuevonombre, rol_id= :nuevorol 
+        WHERE email = :correoantiguo";  
+
+        $stmnt=$this->prepareconn()->prepare($sql);
+        $stmnt->bindValue('nuevoemail', $datos[0]);
+        $stmnt->bindValue('nuevonombre', $datos[1]);
+        $stmnt->bindValue('nuevorol', $datos[2]);
+        $stmnt->bindValue('correoantiguo', $datos[3]);
+        return $stmnt->execute();
+    }
 }
 
 ?>

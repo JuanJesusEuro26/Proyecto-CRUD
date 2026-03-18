@@ -23,24 +23,143 @@
     </header>
 
     <main>
-        <button id="Consulta">Consultar tus datos (los datos se refrescan al pulsar el boton si haces algun cambio)</button>
-
         <div id="datos_user">
             <p id="consultar_email">Email: </p>
             <p id="consultar_nombre">Nombre: </p>
             <p id="consultar_fechanacim">Fecha de Nacimiento: </p>
             <p id="consultar_numops">Numero de Operaciones: </p>
-            <p id="consultar_email">Email: </p>
-
-
-
-            
+            <p id="consultar_rol">Rol: </p>
+            <p id="consultar_id">ID: </p>           
         </div>
 
-        <button id="Actualizar tus datos">Actualizar tus datos</button>
+        <button id="Consulta">Consultar tus datos (los datos se refrescan al pulsar el boton si haces algun cambio)</button>
 
-        <button id="Eliminar usuario">Eliminar Usuario</button>
+        <form id="datos_actualizables">
+            <div id="camposacambiar">
+                <p>Nuevo Email: <input type="email" id="actualizar_email" placeholder="Nuevo Email" required></p>
+                <p>Nuevo Nombre: <input type="text" id="actualizar_nombre" placeholder="Nuevo Nombre" required></p>
+                <p>Nuevo Rol: 
+                <input type="radio" id="rol_admin" name="rol_choice" value="1">
+                <label for="rol_admin">Administrador</label>
+
+                <input type="radio" id="rol_client" name="rol_choice" value="2" checked>
+                <label for="rol_client">Cliente</label></p>
+
+            </div>
+            <button id="Actualizar">Actualizar tus datos</button>
+        </form>
+
+        <h3 id="res"></h3>
+
+        <hr>
+        <button id="Eliminar">Eliminar Usuario</button>
+
+        <button onclick="location.href='{{ path('index') }}'">Volver a inicio</button>
     </main>
+
+    <script>
+        $("#document").ready(function(){
+            $("#camposacambiar").hide();
+            $("#res").hide();
+
+            var emailUsuario= "{{ emailUsuario }}";
+            $("#datos_user").hide();
+
+            $("#Consulta").click(function(){
+            $("#datos_user").fadeOut();
+
+                $.ajax({
+                    url: "{{ path('Consultar') }} ",
+                    method: "POST",
+                    data: { email: emailUsuario},
+                    success: function(res){
+                        if(res.datos){
+                            var d = res.datos; // El array viene dentro de res.datos
+                        
+                            // En JS se concatena con + no con .
+                            $("#consultar_email").html("Email: " + emailUsuario);
+                            $("#consultar_nombre").html("Nombre: " + d.nombre);
+                            $("#consultar_fechanacim").html("Fecha Nacimiento: " + d.fecha_nacimiento);
+                            $("#consultar_numops").html("Operaciones: " + d.num_operaciones);
+                            $("#consultar_id").html("ID: " + d.id);
+                            if(d.rol_id==1){
+                                $("#consultar_rol").html("Rol: Administrador");
+                            } else if(d.rol_id==2){
+                                $("#consultar_rol").html("Rol: Cliente");
+                            }
+
+                            $("#datos_user").fadeIn(); // Queda más bonito que .show()
+                        }
+                        else if(res.error){
+                            $("#res").html(res.error);                            
+                            $("#res").show();
+                        }
+                    },
+                    error: function(){
+                        alert("Error al recuperar los datos");
+                    }
+                });
+            });
+
+            $("#Actualizar").click(function(e) {
+                if ($("#camposacambiar").is(":hidden")) {
+                    e.preventDefault(); 
+                    $("#camposacambiar").fadeIn(); 
+                } 
+                
+            });
+
+            $("#datos_actualizables").on("submit", function(e){
+                e.preventDefault();
+
+                if($("#camposacambiar").is(":visible")){
+                
+                var rolSeleccionado = $("input[name='rol_choice']:checked").val();
+
+                var emailEscrito = $("#actualizar_email").val();
+
+                var datos={
+                    "nuevoEmail": emailEscrito,
+                    "nuevoNombre": $("#actualizar_nombre").val(),
+                    "nuevoRol": rolSeleccionado, // Aquí ya tenemos el 1 o el 2
+                    "emailActual": emailUsuario   // Lo necesitaremos para el WHERE en el SQL
+                }
+
+                console.log(datos);
+
+                $.ajax({
+                    url: "{{ path('Actualizar') }} ",
+                    method: "POST",
+                    data: { datos: datos},
+                    success: function(res){
+                        if(res.exito){
+                            $("#res").html(res.exito);                            
+                            $("#res").show();    
+                            emailUsuario = emailEscrito;
+                            $("#actualizar_email").val("");
+                            $("#actualizar_nombre").val("");
+
+                            $("#Consulta").trigger('click');
+                            
+                            $("#camposacambiar").fadeOut();                        
+                        } else if(res.error){
+                            $("#res").html(res.error);                            
+                            $("#res").show();
+                        }
+                    },
+                    error: function(){
+                        alert("Error al actualizar los datos");
+                    }
+                });
+
+                }
+            });
+
+            $("#Eliminar").click(function(){
+
+            });
+        });
+    </script>
 </body>
 </html>
 {% endblock %}
