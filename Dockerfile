@@ -26,3 +26,8 @@ RUN composer install --no-interaction --optimize-autoloader
 
 # 5. PASO CLAVE: Aseguramos que las carpetas existan y tengan permisos totales
 RUN mkdir -p app/cache app/logs && chmod -R 777 app/cache app/logs
+
+COPY entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
+
+ENTRYPOINT ["entrypoint.sh"]
