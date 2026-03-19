@@ -1,171 +1,169 @@
 {% extends 'proyectfiles/index.html.twig' %}
 
-    {% block head %}
-        <!DOCTYPE html>
-        <html lang="en">
-        <head>
-            {{ parent() }}
-            <title>Menú de Clientes</title>
-        </head>
-    {% endblock %}
+{% block head %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <style>
+        body { background-color: #f0f2f5; padding-top: 30px; padding-bottom: 30px; }
+        .profile-container { max-width: 700px; margin: auto; }
+        .data-label { font-weight: bold; color: #495057; }
+        .card { border: none; border-radius: 15px; }
+        .btn-action { border-radius: 8px; font-weight: 600; }
+    </style>
+    <title>Mi Perfil - Menú de Clientes</title>
+{% endblock %}
 
 {% block body %}
-<body>
-    <header>
-    <h1>Menú de Clientes</h1>
-    <h2>Bienvenido cliente, en esta página podrás:</h2>
-    <ul>
-        <li>Consultar tus datos.</li>
-        <li>Actualizar tus datos.</li>
-        <li>Eliminar tu usuario.</li>
-    </ul>
-    <hr>
-    </header>
+<body class="p-3">
+    <div class="profile-container">
+        <header class="text-center mb-4">
+            <h1 class="display-6 fw-bold text-primary">Panel de Usuario</h1>
+            <p class="text-muted">Gestiona tu información personal y cuenta.</p>
+        </header>
 
-    <main>
-        <div id="datos_user">
-            <p id="consultar_email">Email: </p>
-            <p id="consultar_nombre">Nombre: </p>
-            <p id="consultar_fechanacim">Fecha de Nacimiento: </p>
-            <p id="consultar_numops">Numero de Operaciones: </p>
-            <p id="consultar_rol">Rol: </p>
-            <p id="consultar_id">ID: </p>           
-        </div>
-
-        <button id="Consulta">Consultar tus datos (los datos se refrescan al pulsar el boton si haces algun cambio)</button>
-
-        <form id="datos_actualizables">
-            <div id="camposacambiar">
-                <p>Nuevo Email: <input type="email" id="actualizar_email" placeholder="Nuevo Email" required></p>
-                <p>Nuevo Nombre: <input type="text" id="actualizar_nombre" placeholder="Nuevo Nombre" required></p>
-                <p>Nuevo Rol: 
-                <input type="radio" id="rol_admin" name="rol_choice" value="1">
-                <label for="rol_admin">Administrador</label>
-
-                <input type="radio" id="rol_client" name="rol_choice" value="2" checked>
-                <label for="rol_client">Cliente</label></p>
-
+        <main>
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-white py-3 border-0 d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0 fw-bold">Mis Datos Actuales</h5>
+                    <button id="Consulta" class="btn btn-sm btn-outline-primary btn-action">
+                        Refrescar Datos
+                    </button>
+                </div>
+                <div class="card-body bg-light bg-opacity-50" id="datos_user" style="display:none;">
+                    <div class="row g-3">
+                        <div class="col-md-6"><span class="data-label">Email:</span> <span id="consultar_email"></span></div>
+                        <div class="col-md-6"><span class="data-label">Nombre:</span> <span id="consultar_nombre"></span></div>
+                        <div class="col-md-6"><span class="data-label">F. Nacimiento:</span> <span id="consultar_fechanacim"></span></div>
+                        <div class="col-md-6"><span class="data-label">Operaciones:</span> <span id="consultar_numops" class="badge bg-info text-dark"></span></div>
+                        <div class="col-md-6"><span class="data-label">Rol:</span> <span id="consultar_rol"></span></div>
+                        <div class="col-md-6"><span class="data-label">ID de Usuario:</span> <span id="consultar_id" class="font-monospace"></span></div>
+                    </div>
+                </div>
             </div>
-            <button id="Actualizar">Actualizar tus datos</button>
-        </form>
 
-        <h3 id="res"></h3>
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <form id="datos_actualizables">
+                        <div class="d-grid mb-3">
+                            <button type="button" id="Actualizar" class="btn btn-warning btn-action text-dark">
+                                 Modificar mis datos
+                            </button>
+                        </div>
 
-        <hr>
-        <button id="Eliminar">Eliminar Usuario</button>
+                        <div id="camposacambiar" style="display:none;" class="border-top pt-3 mt-3">
+                            <div class="mb-3">
+                                <label class="form-label small fw-bold">Nuevo Email</label>
+                                <input type="email" id="actualizar_email" class="form-control" placeholder="nombre@correo.com" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label small fw-bold">Nuevo Nombre</label>
+                                <input type="text" id="actualizar_nombre" class="form-control" placeholder="Escribe tu nombre" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label small fw-bold">Cambiar Rol</label>
+                                <div class="btn-group w-100" role="group">
+                                    <input type="radio" class="btn-check" name="rol_choice" id="rol_admin" value="1">
+                                    <label class="btn btn-outline-secondary" for="rol_admin">Administrador</label>
 
-        <button onclick="location.href='{{ path('index') }}'">Volver a inicio</button>
-    </main>
+                                    <input type="radio" class="btn-check" name="rol_choice" id="rol_client" value="2" checked>
+                                    <label class="btn btn-outline-secondary" for="rol_client">Cliente</label>
+                                </div>
+                            </div>
+                            <div class="d-grid mt-4">
+                                <button type="submit" class="btn btn-success btn-action">Confirmar Cambios</button>
+                            </div>
+                        </div>
+                    </form>
+                    <div id="res" class="alert alert-info mt-3 py-2 small text-center" style="display:none;"></div>
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center mt-5">
+                <button class="btn btn-link text-muted text-decoration-none small" onclick="location.href='{{ path('index') }}'">
+                    &larr; Volver al inicio
+                </button>
+                <button id="Eliminar" class="btn btn-outline-danger btn-sm px-4 btn-action">
+                     Eliminar mi cuenta
+                </button>
+            </div>
+        </main>
+    </div>
 
     <script>
-        $("#document").ready(function(){
-            $("#camposacambiar").hide();
+        $(document).ready(function(){
+            // Corregido el selector de document que tenías mal ($("#document"))
             $("#res").hide();
-
-            var emailUsuario= "{{ emailUsuario }}";
-            $("#datos_user").hide();
+            var emailUsuario = "{{ emailUsuario }}";
 
             $("#Consulta").click(function(){
-            $("#datos_user").fadeOut();
-
+                $("#datos_user").fadeOut(200);
                 $.ajax({
-                    url: "{{ path('Consultar') }} ",
+                    url: "{{ path('Consultar') }}",
                     method: "POST",
                     data: { email: emailUsuario},
                     success: function(res){
                         if(res.datos){
-                            var d = res.datos; // El array viene dentro de res.datos
-                        
-                            // En JS se concatena con + no con .
-                            $("#consultar_email").html("Email: " + emailUsuario);
-                            $("#consultar_nombre").html("Nombre: " + d.nombre);
-                            $("#consultar_fechanacim").html("Fecha Nacimiento: " + d.fecha_nacimiento);
-                            $("#consultar_numops").html("Operaciones: " + d.num_operaciones);
-                            $("#consultar_id").html("ID: " + d.id);
-                            if(d.rol_id==1){
-                                $("#consultar_rol").html("Rol: Administrador");
-                            } else if(d.rol_id==2){
-                                $("#consultar_rol").html("Rol: Cliente");
-                            }
-
-                            $("#datos_user").fadeIn(); // Queda más bonito que .show()
+                            var d = res.datos;
+                            $("#consultar_email").text(emailUsuario);
+                            $("#consultar_nombre").text(d.nombre);
+                            $("#consultar_fechanacim").text(d.fecha_nacimiento);
+                            $("#consultar_numops").text(d.num_operaciones);
+                            $("#consultar_id").text("#" + d.id);
+                            $("#consultar_rol").text(d.rol_id == 1 ? "Administrador" : "Cliente");
+                            $("#datos_user").fadeIn();
+                        } else if(res.error){
+                            $("#res").html(res.error).fadeIn();
                         }
-                        else if(res.error){
-                            $("#res").html(res.error);                            
-                            $("#res").show();
-                        }
-                    },
-                    error: function(){
-                        alert("Error al recuperar los datos");
                     }
                 });
             });
 
+            // Disparar consulta inicial automáticamente al cargar
+            $("#Consulta").trigger('click');
+
             $("#Actualizar").click(function(e) {
                 if ($("#camposacambiar").is(":hidden")) {
-                    e.preventDefault(); 
-                    $("#camposacambiar").fadeIn(); 
+                    $("#camposacambiar").fadeIn();
+                    $(this).fadeOut(); // Ocultamos el botón de "Modificar" al abrir el form
                 } 
-                
             });
 
             $("#datos_actualizables").on("submit", function(e){
                 e.preventDefault();
-
-                if($("#camposacambiar").is(":visible")){
-                
-                var rolSeleccionado = $("input[name='rol_choice']:checked").val();
-
-                var emailEscrito = $("#actualizar_email").val();
-
-                var datos={
-                    "nuevoEmail": emailEscrito,
+                var datos = {
+                    "nuevoEmail": $("#actualizar_email").val(),
                     "nuevoNombre": $("#actualizar_nombre").val(),
-                    "nuevoRol": rolSeleccionado, // Aquí ya tenemos el 1 o el 2
-                    "emailActual": emailUsuario   // Lo necesitaremos para el WHERE en el SQL
-                }
-
-                console.log(datos);
+                    "nuevoRol": $("input[name='rol_choice']:checked").val(),
+                    "emailActual": emailUsuario
+                };
 
                 $.ajax({
-                    url: "{{ path('Actualizar') }} ",
+                    url: "{{ path('Actualizar') }}",
                     method: "POST",
                     data: { datos: datos},
                     success: function(res){
                         if(res.exito){
-                            $("#res").html(res.exito);                            
-                            $("#res").show();    
-                            emailUsuario = emailEscrito;
-                            $("#actualizar_email").val("");
-                            $("#actualizar_nombre").val("");
-
+                            $("#res").removeClass('alert-danger').addClass('alert-success').html(res.exito).fadeIn();
+                            emailUsuario = datos.nuevoEmail;
+                            $("#actualizar_email, #actualizar_nombre").val("");
                             $("#Consulta").trigger('click');
-
-                            $("#camposacambiar").fadeOut();                        
+                            $("#camposacambiar").fadeOut();
+                            $("#Actualizar").fadeIn();
                         } else if(res.error){
-                            $("#res").html(res.error);                            
-                            $("#res").show();
+                            $("#res").removeClass('alert-success').addClass('alert-danger').html(res.error).fadeIn();
                         }
-                    },
-                    error: function(){
-                        alert("Error al actualizar los datos");
                     }
                 });
-
-                }
             });
 
             $("#Eliminar").click(function(){
-                var confirmar = confirm("¿Estás seguro de que quieres eliminar tu cuenta? Esta acción no se puede deshacer.");
-    
-                if (confirmar) {
-                    alert("Usuario eliminado correctamente. Redirigiendo al inicio...");
-                    // Redirigimos a la ruta de eliminar pasando el email
+                if (confirm("¿Estás seguro? Esta acción cerrará tu sesión permanentemente.")) {
                     window.location.href = "{{ path('Eliminar') }}?email=" + emailUsuario;
                 }
             });
         });
     </script>
 </body>
-</html>
 {% endblock %}

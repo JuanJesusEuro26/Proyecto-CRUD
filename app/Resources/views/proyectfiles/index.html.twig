@@ -6,16 +6,35 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
         <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+        <script src="{{ asset('js/particles.min.js') }}"></script>
         <style>
             
             body { 
+
+                background-image: url("{{ asset('img/coolbackground.png') }}");
+
+                background-size: cover;
+                background-position: center;
+                background-attachment: fixed;
+                background-repeat: no-repeat;
+
+
                 min-height: 100vh; 
                 display: flex; 
                 align-items: center; 
                 justify-content: center; 
                 background-color: #f0f2f5; 
             }
-            .login-container { max-width: 400px; width: 100%; }
+            .login-container { max-width: 500px; width: 100%; }
+
+            .login-card {
+                background-color: rgba(255, 255, 255, 0.9) !important;
+                backdrop-filter: blur(5px); 
+                border: none;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            }
+
+            
         </style>
     {% endblock %}
     <title>Inicio CRUD</title>
@@ -23,6 +42,7 @@
 
 {% block body %}
 <body class="p-3 bg-secondary-subtle">
+<div id="particles-js" style="position: fixed; width: 100%; height: 100%; top: 0; left: 0; z-index: -1; background-color: #232741;"></div>
     <div class="login-container">
         
         <main class="card shadow border-0 overflow-hidden">
@@ -64,9 +84,14 @@
             &copy; 2026 Sistema CRUD
         </footer>
     </div>
+    </div>
 
     <script>
         $(document).ready(function(){
+            particlesJS.load('particles-js', '{{ asset('js/particlesjs-config.json') }}', function() {
+                console.log('particles.js loaded - callback');
+            });
+
             $("#Ini_sesion").on("submit", function(e){
                 e.preventDefault();
                 $("#Res").hide();
