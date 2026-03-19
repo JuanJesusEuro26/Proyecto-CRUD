@@ -1,0 +1,33 @@
+version: '3.7'
+
+services:
+  app:
+    build: .
+    container_name: symfony_app
+    volumes:
+      - .:/var/www/html
+    environment:
+      # Ajustado a tus credenciales: usuario root, pass root, db usuarios
+      - DATABASE_URL=mysql://root:root@mysql:3306/usuarios
+
+  web:
+    image: nginx:alpine
+    container_name: symfony_web
+    ports:
+      - "8080:80"
+    volumes:
+      - .:/var/www/html
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - mysql # Cambiado 'app' por 'mysql' para asegurar orden
+
+  # Cambiamos el nombre del servicio de 'db' a 'mysql' 
+  # para que database_host: mysql funcione
+  mysql: 
+    image: mysql:5.7
+    container_name: symfony_db
+    environment:
+      MYSQL_ROOT_PASSWORD: root        # Tu contraseña del parameters
+      MYSQL_DATABASE: usuarios         # Tu base de datos del parameters
+    ports:
+      - "3306:3306"
