@@ -1,6 +1,6 @@
 FROM php:7.1-fpm-alpine
 
-# Instalamos extensiones necesarias para Symfony viejo (intl, pdo_mysql, gd)
+# 1. Instalamos extensiones necesarias
 RUN apk add --no-cache \
     icu-dev \
     libzip-dev \
@@ -12,13 +12,17 @@ RUN apk add --no-cache \
     zip \
     gd
 
-# Instalamos Composer (versión compatible con PHP 7.1)
+# 2. Instalamos Composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
 WORKDIR /var/www/html
 
-# COPIA DEL PROYECTO: Metemos tu carpeta app, src, web, etc. dentro de la imagen
+# 3. Copiamos el proyecto
 COPY . .
 
-# Permisos críticos para Symfony: app/cache y app/logs deben ser escribibles
-RUN chmod -R 777 app/cache app/logs
+# 4. PASO CLAVE: Ejecutamos composer install durante la construcción de la imagen.
+# Esto genera el bootstrap.php.cache y descarga los vendors automáticamente.
+RUN composer install --no-interaction --optimize-autoloader
+
+# 5. PASO CLAVE: Aseguramos que las carpetas existan y tengan permisos totales
+RUN mkdir -p app/cache app/logs && chmod -R 777 app/cache app/logs
