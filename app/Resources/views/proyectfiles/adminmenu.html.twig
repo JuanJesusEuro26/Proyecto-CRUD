@@ -1,13 +1,285 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin menu</title>
-</head>
+{% extends 'proyectfiles/index.html.twig' %}
+
+    {% block head %}
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            {{ parent() }}
+            <title>Menú de Administradores</title>
+        </head>
+    {% endblock %}
+
+{% block body %}
 <body>
-    <h1>admin menu</h1>
-    
+    <header>
+    <h1>Menú de Administradores</h1>
+    <h2>Bienvenido Administrador, en esta página podrás:</h2>
+    <ul>
+        <li>Consultar los datos de todos los usuarios, aplicando distintos filtros.</li>
+        <li>Actualizar los datos de todos los usuarios.</li>
+        <li>Eliminar a cualquier usuario.</li>
+    </ul>
+    <hr>
+    </header>
+
+    <main>
+    {#Aqui iran distintos filtros. Idea: filtros para solo ver los usuarios activos o inactivos. Los filtros los aplicaremos usando checkboxes y un sql que se vaya ampliando progresivamente segun las diferentes combinaciones que hagamos de filtros.#}
+        <div id="Filtros">
+        <p><strong>Filtros: </strong></p>
+        <label for="Usuarios_Activos"><strong>Mostrar solo usuarios activos o inactivos: </strong></label>
+        <select id="Usuarios_Actividad">
+            <option value="">Activos e inactivos</option>
+            <option value="1">Activos</option>
+            <option value="0">Inactivos</option>
+        </select>
+
+        <label for="Usuarios_Rol"><strong>Mostrar solo usuarios administradores o clientes: </strong></label>
+        <select id="Usuarios_Rol">
+            <option value="">Administradores y Clientes</option>
+            <option value="1">Administradores</option>
+            <option value="2">Clientes</option>
+        </select>
+
+
+        <label for="Usuarios_Antiguos"><strong>Mostrar usuarios nacidos antes de: </strong></label>
+        <input type="date" id="Usuarios_Antiguos" max="2009-12-12" default="2009-12-12">
+
+        <label for="Usuarios_Operaciones"><strong>Mostrar usuarios con mas de x operaciones: </strong></label>
+        <input type="number" id="Usuarios_Operaciones" style="width: 55px;" max="999">
+
+        </div>
+
+        <div id="contenedor_tabla" style="display:none; margin-bottom: 20px;">
+            <table border="1" id="tabla_usuarios" style="width:100%; text-align:left; border-collapse: collapse;">
+                <thead style="background-color: #f2f2f2;">
+                    <tr>
+                        <th>ID</th>
+                        <th>Nombre</th>
+                        <th>Email</th>
+                        <th>F. Nacimiento</th>
+                        <th>Operaciones</th>
+                        <th>Rol</th>
+                        <th>Estado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    
+                </tbody>
+            </table>
+        </div>
+
+        <hr>
+
+        
+        <form id="ActualizarUser">
+        <div id="actualizardiv">
+        <h3>Actualizar Usuarios</h3>
+            
+            <label for="emailuser">Email del usuario a modificar: </label>
+            <input id="emailuser" type="email" placeholder="Email del usuario a modificar." required>
+
+            <p>
+            <label for="nuevoemail">Nuevo email del usuario: </label>
+            <input id="newemail" type="email" placeholder="Nuevo email." required></p>
+
+            <p>
+            <label for="nuevonombre">Nuevo nombre del usuario: </label>
+            <input id="newname" type="text" placeholder="Nuevo nombre." required></p>
+
+            <p>Nuevo Rol: 
+                <input type="radio" id="rol_admin" name="rol_choice" value="1">
+                <label for="rol_admin">Administrador</label>
+
+                <input type="radio" id="rol_client" name="rol_choice" value="2" checked>
+                <label for="rol_client">Cliente</label></p>
+            </div>
+            <button id="Actualizar">Actualizar los datos del usuario</button>
+        </form>
+
+        <div id="eliminar">
+            <label for="emailaeliminar">Email del usuario a eliminar: </label>
+            <input id="emailaeliminar" type="email" placeholder="Email del usuario a eliminar." required>
+            <button id="Eliminar">Eliminar Usuario</button>
+        </div>
+
+
+        <h3 id="res"></h3>
+
+        <button onclick="location.href='{{ path('index') }}'">Volver a inicio</button>
+    </main>
+
+    <script>
+        $(document).ready(function(){ // Corregido el selector de document
+            $("#res").hide();
+            $("#tabla_usuarios tbody").empty();
+            cargarTabla();
+            $("#actualizardiv").hide();
+        
+        $("#Usuarios_Actividad").change(function(){
+            cargarTabla();
+        });
+
+        $("#Usuarios_Rol").change(function(){
+            cargarTabla();
+        });
+
+        $("#Usuarios_Antiguos").change(function(){
+            cargarTabla();
+        });
+
+        $("#Usuarios_Operaciones").change(function(){
+            cargarTabla();
+        });
+
+         $("#Actualizar").click(function(e) {
+                if ($("#actualizardiv").is(":hidden")) {
+                    e.preventDefault(); 
+                    $("#actualizardiv").fadeIn(); 
+                } 
+                
+            });
+
+            $("#ActualizarUser").on("submit", function(e){
+            e.preventDefault();
+
+            if($("#actualizardiv").is(":visible")){
+                
+                var rolSeleccionado = $("input[name='rol_choice']:checked").val();
+                
+                // Usamos los nuevos IDs que definiste en el HTML
+                var emailAntiguo = $("#emailuser").val(); 
+                var emailNuevo = $("#newemail").val();
+                var nombreNuevo = $("#newname").val();
+
+                var datos = {
+                    "nuevoEmail": emailNuevo,
+                    "nuevoNombre": nombreNuevo,
+                    "nuevoRol": rolSeleccionado,
+                    "emailActual": emailAntiguo 
+                };
+
+                $.ajax({
+                    url: "{{ path('ActualizarAdmin') }}",
+                    method: "POST",
+                    data: { datos: datos },
+                    success: function(res){
+                        if(res.logout){
+                            alert(res.logout);
+                            window.location.href = "{{ path('index') }}"; // Te saca al index
+                            return; // Cortamos la ejecución aquí
+                        }
+                        if(res.exito){
+                            $("#res").html(res.exito).show();    
+                            
+                            // Limpiamos los campos del formulario
+                            $("#emailuser").val("");
+                            $("#newemail").val("");
+                            $("#newname").val("");
+
+                            // Refrescamos la tabla automáticamente para ver los cambios
+                            cargarTabla(); 
+
+                            // Ocultamos el div y reseteamos el botón
+                            $("#actualizardiv").fadeOut();
+                            $("#Actualizar").text("Actualizar tus datos");
+                        } else if(res.error){
+                            $("#res").html(res.error).show();
+                        }
+                    },
+                    error: function(){
+                        alert("Error al actualizar los datos del usuario");
+                    }
+                });
+            }
+        });
+
+        $("#Eliminar").click(function(){
+            var emailABorrar = $("#emailaeliminar").val();
+
+            if (emailABorrar === "") {
+                $("#res").html("<span style='color:orange;'>Escribe un email primero.</span>").show();
+                return;
+            }
+
+            if (confirm("¿Seguro que quieres borrar a " + emailABorrar + "?")) {
+                $.ajax({
+                    url: "{{ path('EliminarAdmin') }}",
+                    method: "GET",
+                    data: { email: emailABorrar },
+                    success: function(res) {
+                        if (res.logout) {
+                            alert(res.mensaje);
+                            window.location.href = "{{ path('index') }}";
+                        } else if (res.exito) {
+                            $("#res").html("<span style='color:green;'>" + res.exito + "</span>").show();
+                            $("#emailaeliminar").val("");
+                            cargarTabla(); 
+                        }
+                    },
+                    error: function(xhr) {
+                        // Capturamos el mensaje "El usuario... no existe" enviado desde el controlador
+                        var errorMsg = (xhr.responseJSON) ? xhr.responseJSON.error : "Error al eliminar.";
+                        $("#res").html("<span style='color:red;'>" + errorMsg + "</span>").show();
+                    }
+                });
+            }
+        });
+
+
+
+        function cargarTabla(){
+            $("#tabla_usuarios tbody").fadeOut();
+            $("#tabla_usuarios tbody").empty();
+            $("#tabla_usuarios tbody").fadeIn();
+            $("#res").hide();
+            $("#res").html("");
+
+            var filtros={
+                "activos": $("#Usuarios_Actividad").val() || "",
+                "rol": $("#Usuarios_Rol").val() || "",
+                "Fechanacim": $("#Usuarios_Antiguos").val() || "",
+                "Numops": $("#Usuarios_Operaciones").val() || ""
+            }
+
+            $.ajax({
+                url: "{{ path('ConsultarAdmin') }}",
+                method: "POST",
+                data: { filtros: filtros},
+                success: function(res){
+                    if(res.datos && res.datos.length > 0){
+                        $.each(res.datos, function(index, user){
+                            var rolTexto = (user.rol_id == 1) ? "Administrador" : "Cliente";
+                            var estadoTexto = (user.is_active == 1) ? "Activo" : "Inactivo";
+                            
+                            // Estilo visual para usuarios borrados lógicamente
+                            var estiloFila = (user.is_active == 0) ? "style='color:red; background-color:#ffe6e6;'" : "";
+                            var tachado = (user.is_active == 0) ? "style='text-decoration:line-through;'" : "";
+
+                            var fila = "<tr " + estiloFila + ">" +
+                                "<td>" + user.id + "</td>" +
+                                "<td>" + user.nombre + "</td>" +
+                                "<td " + tachado + ">" + user.email + "</td>" +
+                                "<td>" + user.fecha_nacimiento + "</td>" +
+                                "<td>" + user.num_operaciones + "</td>" +
+                                "<td>" + rolTexto + "</td>" +
+                                "<td><strong>" + estadoTexto + "</strong></td>" +
+                            "</tr>";
+                            
+                            $("#tabla_usuarios tbody").append(fila);
+                        });
+
+                        $("#contenedor_tabla").fadeIn();
+                    } else {
+                        $("#res").html("No hay usuarios registrados en la base de datos.").show();
+                    }
+                },
+                error: function(){
+                    $("#res").html("Error al conectar con el servidor.").show();
+                }
+            });
+        }
+            
+        });
+    </script>
 </body>
-</html>
+{% endblock %}

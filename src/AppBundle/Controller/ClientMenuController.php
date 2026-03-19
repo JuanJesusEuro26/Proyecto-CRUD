@@ -21,9 +21,9 @@ class ClientMenuController extends Controller{
             return new JsonResponse(['error' => 'No se recibió el email'], 400);            
         }
 
-        $rol=2; //Es cliente
+        
         $consultarservice=$this->get('consultardatos');
-        $datos=$consultarservice->ConsultarData($email, $rol);
+        $datos=$consultarservice->ConsultarData($email);
 
         //Aumentamos el numero de operaciones con nuestro servicio 
         $sumarops=$this->get('aumentarnops');

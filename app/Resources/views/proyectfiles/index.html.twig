@@ -1,74 +1,91 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     {% block head %}
         <meta charset="UTF-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-        <script src="https://code.jquery.com/jquery-4.0.0.min.js" integrity="sha256-OaVG6prZf4v69dPg6PhVattBXkcOWQB62pdZ3ORyrao=" crossorigin="anonymous"></script>
+        <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+        <style>
+            
+            body { 
+                min-height: 100vh; 
+                display: flex; 
+                align-items: center; 
+                justify-content: center; 
+                background-color: #f0f2f5; 
+            }
+            .login-container { max-width: 400px; width: 100%; }
+        </style>
     {% endblock %}
-    
     <title>Inicio CRUD</title>
 </head>
-{% block body %}
-<body> {#Este index tendrá cuatro opciones principalmente (respondiendo con la funcionalidad de un CRUD: Crear, leer, actualizar y borrar un usuario), que estarán bloqueadas a través de un inicio de sesión para cumplir con #}
-    <header>
-        <h1>Gestion de usuarios</h1>
-        <h3>En esta página podrás Crear, Leer, Actualizar y Borrar un usuario (CRUD)<h3>
-    </header>
 
-    <main>
-        <form id="Ini_sesion">
-            <h4>Introduce tu email y tu contraseña<h4>
-            <input type="text" placeholder="email" id="email" required>
-            <input type="password" placeholder="contraseña" id="contraseña" required>
-            <hr>
-            <button type="submit">Iniciar Sesión</button>
-        </form>
-        <h3 style="color: red;" id="Res"></h3>
-        <br>
-        <div id="Registro">
-            <h4>¿No tienes usuario creado o quieres crear otro usuario?</h4>
-            <button type="submit" onclick="location.href='{{ path('Registro') }}'">Registrar Usuario</button>
-        </div>
-    </main>
-    
+{% block body %}
+<body class="p-3 bg-secondary-subtle">
+    <div class="login-container">
+        
+        <main class="card shadow border-0 overflow-hidden">
+            
+            <header class="card-header bg-primary bg-opacity-75 text-white text-center py-4 border-0">
+                <h1 class="h3 fw-bold mb-1">Gestión de Usuarios</h1>
+                <p class="small mb-0 opacity-75">Crea, Lee, Actualiza y Borra (CRUD)</p>
+            </header>
+
+            <div class="card-body p-4 text-center">
+                <form id="Ini_sesion">
+                    <h5 class="mb-3 text-secondary">Identificación</h5>
+                    
+                    <div class="mb-3">
+                        <input type="email" class="form-control" placeholder="Email" id="email" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <input type="password" class="form-control" placeholder="Contraseña" id="contraseña" required>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100 fw-bold py-2">Iniciar Sesión</button>
+                </form>
+
+                <div id="Res" class="alert alert-danger mt-3 py-2 small" style="display:none;"></div>
+
+                <hr class="my-4">
+
+                <div id="Registro">
+                    <p class="small text-muted mb-2">¿No tienes usuario?</p>
+                    <button type="button" class="btn btn-outline-success btn-sm px-4" onclick="location.href='{{ path('Registro') }}'">
+                        Registrar Usuario
+                    </button>
+                </div>
+            </div>
+        </main>
+
+        <footer class="text-center mt-3 text-muted small">
+            &copy; 2026 Sistema CRUD
+        </footer>
+    </div>
 
     <script>
         $(document).ready(function(){
-            $("#Res").hide();
             $("#Ini_sesion").on("submit", function(e){
-                $("#Res").hide();
                 e.preventDefault();
+                $("#Res").hide();
 
-                var email=$("#email").val();
-                var pswd=$("#contraseña").val();
-                var datos={email: email, pswd: pswd};
-
-                //Llamada a controlador pasandole la info. Este controlador decide que pagina cargar en funcion de si el usuario es admin (podra ver todos los clientes y eliminar o actualizar la informacion de cualquiera) o client (podra actualizar su informacion o eliminar su usuario)
                 $.ajax({
                     url:" {{ path('Identificacion') }}",
                     type: 'POST',
-                    data: datos,
+                    data: { email: $("#email").val(), pswd: $("#contraseña").val() },
                     success: function(res){
-                        if(res.redirect){
-                            window.location.href = res.redirect; // Redirigimos si todo es ok
+                        if(res.redirect) {
+                            window.location.href = res.redirect;
                         } else {
-                            $("#Res").html(res.error);
+                            $("#Res").html(res.error).fadeIn();
                             $("#Ini_sesion")[0].reset();
-                            $("#Res").show();
                         }
                     },
-                    error: function(xhr){
-                        console.log(xhr.responseText);
-                        alert("Error crítico en el servidor.");
-                    }
-
-
+                    error: function() { alert("Error en el servidor."); }
                 });
             });
-
         });
     </script>
 </body>

@@ -16,19 +16,21 @@ class ConsultarService{
         $this->em=$em;
     }
 
-    public function ConsultarData(string $email, int $rol){ //Esta funcion devuelve la informacion de un usuario o la de todos en funcion del rol del usuario
-
+    public function ConsultarData(string $email){ 
+    //Esta funcion devuelve la informacion de un usuario cliente 
          /** @var UsersRepository $repo */
          $repo=$this->em->getRepository('AppBundle:Usuario');
+        
+         return $repo->infoUser($email);
+    }
 
-        if($rol==1){ //Si es admin mostramos los datos de todos los usuarios
+    public function ConsultarDataAdmin(array $filtros){
 
-        } else if($rol==2){ //Si es cliente mostramos solo sus datos
-            return $repo->infoUser($email);
-        } else{ //Esto no se deberia poder
-            return new JsonResponse(array('error'=>'Error al buscar los datos.'));
-        }
 
+        /** @var UsersRepository $repo */
+        $repo=$this->em->getRepository('AppBundle:Usuario');
+
+        return $repo->ConsultarUsuarios($filtros);
     }
 
 }

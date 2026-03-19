@@ -16,19 +16,12 @@ class ActualizarService{
         $this->em=$em;
     }
 
-    public function ActualizarData(array $datos, int $rol){ 
+    public function ActualizarData(array $datos){ 
 
          /** @var UsersRepository $repo */
          $repo=$this->em->getRepository('AppBundle:Usuario');
 
-         if($rol==1){ //Si es admin mostramos los datos de todos los usuarios
-
-         } else if($rol==2){ //Si es cliente mostramos solo sus datos
-             return $repo->ActualizarUser($datos);
-         } else{ //Esto no se deberia poder
-             return new JsonResponse(array('error'=>'Error al buscar los datos.'));
-         }
-        
+        return $repo->ActualizarUser($datos);        
     }
 
 }

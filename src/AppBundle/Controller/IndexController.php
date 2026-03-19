@@ -37,8 +37,11 @@ class IndexController extends Controller{
         $existeemail=$repo->comprobarEmail($email);
         if($existeemail){ //Comprobamos email
             //Comprobamos si el usuario esta activo (el usuario no ha borrado la cuenta)
-            $activo=$repo->isuseractive($email);
-            if($activo==1){
+            //$activo=$repo->isuseractive($email);
+            //if($activo==1){ 
+
+                //ANTES PARA COMPROBAR SI EL USUARIO ESTABA ACTIVO USABAMOS LA FUNCION IS_USERACTIVE. AHORA HEMOS ACTUALIZADO LAS CONSULTAS SQL PARA QUE FILTREN SOLO POR USUARIOS QUE TENGAN EL USUARIO ACTIVO.
+
                 $contraseñacorrecta=$repo->comprobarContraseña($email, $password);
                 if($contraseñacorrecta){
                     $rolusuario=$repo->comprobarRol($email);
@@ -57,9 +60,6 @@ class IndexController extends Controller{
                 } else{
                     return new JsonResponse(array("error"=>"Este email esta registrado pero la contraseña introducida es incorrecta."));
                 }
-            } else if ($activo==0){
-                return new JsonResponse(array("error"=>"Este usuario ya ha sido registrado pero la cuenta ha sido borrada.")); //EL PROCEDIMIENTO PARA CUANDO PASA ESTO TENGO QUE PREGUNTARLO
-            }
         } else{
             //El email no esta registrado por lo tanto da respuesta json
             return new JsonResponse(array("error"=>"Este email no se ha encontrado en nuestra base de datos."));
@@ -71,7 +71,17 @@ class IndexController extends Controller{
      * @Route("/Index/Admin", name="admin_home")
      */
     public function adminHomeAction() {
-        return $this->render('proyectfiles/adminmenu.html.twig');
+        $session = new Session();
+        $email = $session->get('user_email');
+
+        // Si no hay email en sesión, lo echamos al login
+        if (!$email) {
+            return $this->redirectToRoute('index');
+        }
+
+        return $this->render('proyectfiles/adminmenu.html.twig', [
+            'emailUsuario' => $email
+        ]);
     }
 
     /**

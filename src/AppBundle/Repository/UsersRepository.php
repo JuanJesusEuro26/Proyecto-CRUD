@@ -28,7 +28,7 @@ class UsersRepository extends EntityRepository{
 
     public function comprobarEmail(string $email){
 
-        $sql = "SELECT email FROM registrar_users WHERE email = :correo";
+        $sql = "SELECT email FROM registrar_users WHERE email = :correo AND is_active=1";
 
         $stmnt=$this->prepareconn()->prepare($sql);
         $stmnt->bindValue('correo', $email);
@@ -57,7 +57,7 @@ class UsersRepository extends EntityRepository{
     }
 
     public function comprobarRol(string $email){
-        $sql="SELECT rol_id FROM registrar_users WHERE email= :correo";
+        $sql="SELECT rol_id FROM registrar_users WHERE email= :correo AND is_active=1";
         $stmnt=$this->prepareconn()->prepare($sql);
         $stmnt->bindValue('correo', $email);
         $stmnt->execute();
@@ -72,7 +72,7 @@ class UsersRepository extends EntityRepository{
     }
 
     public function comprobarContraseña(string $email, string $contraseña){
-        $sql="SELECT password FROM registrar_users WHERE email= :correo";
+        $sql="SELECT password FROM registrar_users WHERE email= :correo AND is_active=1";
         $stmnt=$this->prepareconn()->prepare($sql);
         $stmnt->bindValue('correo', $email);
         $stmnt->execute();
@@ -108,7 +108,7 @@ class UsersRepository extends EntityRepository{
     }
 
     public function infoUser(string $email){
-        $sql="SELECT * FROM registrar_users WHERE email= :correo";
+        $sql="SELECT * FROM registrar_users WHERE email= :correo AND is_active=1";
         $stmnt=$this->prepareconn()->prepare($sql);
         $stmnt->bindValue('correo', $email);
         $stmnt->execute();
@@ -124,7 +124,7 @@ class UsersRepository extends EntityRepository{
     public function aumentarnOps(string $email){
         $sql = "UPDATE registrar_users 
         SET num_operaciones = num_operaciones + 1 
-        WHERE email = :correo";        
+        WHERE email = :correo AND is_active=1";        
         
         $stmnt=$this->prepareconn()->prepare($sql);
         $stmnt->bindValue('correo', $email);
@@ -134,7 +134,7 @@ class UsersRepository extends EntityRepository{
     public function ActualizarUser(array $datos){
         $sql = "UPDATE registrar_users 
         SET email = :nuevoemail, nombre= :nuevonombre, rol_id= :nuevorol 
-        WHERE email = :correoantiguo";  
+        WHERE email = :correoantiguo AND is_active=1";  
 
         $stmnt=$this->prepareconn()->prepare($sql);
         $stmnt->bindValue('nuevoemail', $datos[0]);
@@ -145,12 +145,34 @@ class UsersRepository extends EntityRepository{
     }
 
     public function EliminarUser(string $email) {
-        $sql = "DELETE FROM registrar_users WHERE email = :correo";
+        $sql = "UPDATE registrar_users SET is_active = 0 WHERE email = :correo"; //Esto es borrado logico: no lo elimino de la tabla, simplemente pongo un atributo (is_active) a 0
         
         $stmnt = $this->prepareconn()->prepare($sql);
         $stmnt->bindValue('correo', $email);
         
         return $stmnt->execute();
+    }
+
+    public function ConsultarUsuarios($filtros){
+        $sql = "SELECT * FROM registrar_users WHERE 1=1";
+
+        // Construimos el SQL dinámicamente
+        if ($filtros['activos'] !== "") { $sql .= " AND is_active = :activo"; }
+        if ($filtros['rol'] !== "") { $sql .= " AND rol_id = :rol"; }
+        if ($filtros['Fechanacim'] !== "") { $sql .= " AND fecha_nacimiento < :fecha"; }
+        if ($filtros['Numops'] !== "") { $sql .= " AND num_operaciones > :numops"; }
+
+        $stmnt = $this->prepareconn()->prepare($sql);
+
+        // Hacemos el bind solo SI el filtro no está vacío
+        // Esto garantiza que el número de binds coincida con el de tokens en el SQL
+        if ($filtros['activos'] !== "") { $stmnt->bindValue('activo', $filtros['activos']); }
+        if ($filtros['rol'] !== "") { $stmnt->bindValue('rol', $filtros['rol']); }
+        if ($filtros['Fechanacim'] !== "") { $stmnt->bindValue('fecha', $filtros['Fechanacim']); }
+        if ($filtros['Numops'] !== "") { $stmnt->bindValue('numops', $filtros['Numops']); }
+
+        $stmnt->execute();
+        return $stmnt->fetchAll();
     }
 }
 
